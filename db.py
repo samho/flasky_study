@@ -1,6 +1,10 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 import os
-from flask import Flask
+from flask import Flask, render_template, session, redirect, url_for, flash
+from flask.ext.bootstrap import Bootstrap
+from flask.ext.wtf import Form
+from wtforms import StringField, SubmitField
+from wtforms.validators import Required
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -10,6 +14,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'da
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 
 db = SQLAlchemy(app)
+app.config['SECRET_KEY'] = 'hard to do ='
+bootstrap = Bootstrap(app)
+
+
+class Nameform(Form):
+    name = StringField("Whatt is your name?", validators=[Required()])
+    submit = SubmitField('Submit')
 
 
 class Role(db.Model):
@@ -32,3 +43,25 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r' % self.username
+
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    form = Nameform()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is None:
+            user = User(username=form.name.data)
+            db.session.add(user)
+            session['known'] = False
+        else:
+            session['known'] = True
+
+        session['name'] = form.name.data
+        form.name.data = ''
+        return redirect(url_for('index'))
+    return render_template('db.html', form=form, name=session.get('name'), known=session.get('known', False))
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
