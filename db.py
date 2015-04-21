@@ -25,7 +25,7 @@ manager.add_command('db', MigrateCommand)
 
 
 class Nameform(Form):
-    name = StringField("Whatt is your name?", validators=[Required()])
+    name = StringField("Whatt is your name?", validatoirs=[Required()])
     submit = SubmitField('Submit')
 
 
