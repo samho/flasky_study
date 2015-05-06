@@ -1,4 +1,4 @@
-from flask.ext.sqlalchemy  import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy
 import os
 from flask import Flask, render_template, session, redirect, url_for, flash
 from flask.ext.bootstrap import Bootstrap
